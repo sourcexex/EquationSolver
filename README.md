@@ -53,3 +53,20 @@ Windows 请使用 `.exe` 结尾的安装包
 ```bash
 uv sync
 ```
+
+## 构建与 CI
+仓库已配置 GitHub Actions：
+
+- `.github/workflows/ci.yml`：向任意分支推送或提交 PR 时自动运行 CI（安装依赖、字节码编译、模块导入检查）
+- `.github/workflows/build.yml`：推送到 `master`/`main`、推送 `v*` 标签或手动触发时，使用 Nuitka 以 `--standalone`（多文件）方式打包。版本号不写死，由 git 标签自动推导（如标签 `v1.2.3` → `1.2.3`；非标签触发时使用 `0.0.<CI 运行序号>`），并写入 exe 文件版本信息；产物为 `EquationSolver-<版本>-windows-x64.zip` 并上传为 Artifact，推送标签时自动附加到对应的 Release
+
+本地打包（多文件）可使用：
+
+```bat
+uv sync
+uv run python -m nuitka --standalone --enable-plugin=pyside6 --include-package-data=sympy ^
+    --nofollow-import-to=sympy.testing --nofollow-import-to=sympy.*.tests ^
+    --include-data-dir=src/resources=src/resources --windows-console-mode=disable ^
+    --windows-icon-from-ico=src/resources/logo.ico --output-dir=build ^
+    --output-filename=EquationSolver.exe --remove-output src/main.py
+```

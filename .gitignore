@@ -9,3 +9,11 @@
 .venv/
 
 __pycache__
+
+# Nuitka / packaging output
+build/
+dist/
+*.dist/
+*.build/
+*.onefile-build/
+*.zip

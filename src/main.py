@@ -1,15 +1,22 @@
 import sys
 import time
+import logging
+
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QAction, QIcon
-from core import mth
+from PySide6.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox
+
+from core import tools
 from ui.ui_MainWindow import Ui_MainWindow
-import logging
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from ui.about_ui import Ui_Dialog as Ui_About_Dialog
 
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
-logging.basicConfig(level=logging.DEBUG)
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -42,9 +49,13 @@ class MainWindow(QMainWindow):
         self.ui.lineEdit_range.setText("")
 
     def solve_clicked(self):
+        global time_used, answer
         logging.debug("求解按钮已按下")
         eqn = self.ui.lineEdit_eqn.text()
         unknow = self.ui.lineEdit_unknow.text()
+        fr = None
+        im = None
+        ne = None
         if self.ui.radioButton_fr_auto.isChecked():
             fr = None
         elif self.ui.radioButton_fr_true.isChecked():
@@ -70,57 +81,65 @@ class MainWindow(QMainWindow):
         else:
             constraints = self.ui.lineEdit_range.text()
         try:
-            s1 = time.time()
-            ans = mth.solve_equation(eqn, unknow, fr, im, ne, constraints)
-            s2 = time.time()
-            s = s2-s1
-            logging.debug(f"结果:{ans}\n用时:{s}")
-        except Exception as e:
-            logging.error(f"错误:{e}")
+            time_1 = time.time()
+            answer = tools.solve_equation(eqn, unknow, fr, im, ne, constraints)
+            time_2 = time.time()
+            time_used = time_2-time_1
+            logging.debug(f"结果:{answer}\n用时:{time_used}")
+        except Exception as error:
+            logging.error(f"错误:{error}")
             if self.ui.lineEdit_eqn.text() == "":
                 self.ui.textBrowser_output.setText("未填写方程!!!\n请填写方程")
                 self.ui.textBrowser_output.setEnabled(True)
             else:
-                self.ui.textBrowser_output.setText(f"求解方程出错,请检查方程是否错误!!!\n详细错误信息如下:\n{str(e)}")
+                self.ui.textBrowser_output.setText(f"求解方程出错,请检查方程是否错误!!!\n详细错误信息如下:\n{str(error)}")
                 self.ui.textBrowser_output.setEnabled(True)
-        if ans is None:
+        if answer is None:
             self.ui.textBrowser_output.setText("此方程无解!!!\n请检查范围，未知数和方程是否正确")
         else:
-            if isinstance(ans,dict) == False and len(ans) > 1:
-                stra = "以下是所有解:\n"
-                for i in range(len(ans)):
-                    ansa = ans[i]
-                    stra = stra + str(ansa)[1:-1] + "\n"+"-"*10+"\n"
-                self.ui.textBrowser_output.setText(stra+"\n用时: "+str(s))
+            if isinstance(answer,dict) == False and len(answer) > 1:
+                str_result = "以下是所有解:\n"
+                for i in range(len(answer)):
+                    ans_tmp = answer[i]
+                    str_result = str_result + str(ans_tmp)[1:-1] + "\n"+"-"*10+"\n"
+                str_result = str_result+"\n用时: "+str(time_used)
+                self.ui.textBrowser_output.setText(str_result)
             else:
-                self.ui.textBrowser_output.setText(str(ans)[1:-1]+"\n\n用时:"+str(s))
+                self.ui.textBrowser_output.setText(str(answer)[1:-1]+"\n\n用时:"+str(time_used))
         self.ui.textBrowser_output.setEnabled(True)
-
-    def about_clicked(self):
-        logging.debug("关于按钮已按下")
-        about_msg = QMessageBox()
-        about_msg.setWindowTitle("关于")
-        icon = QIcon()
-        icon.addFile(u"logo.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        about_msg.setWindowIcon(icon)
-        about_msg.setText("Equation Solver\n版本: v1.0\n作者: SourceX")
-        about_msg.show()
-        about_msg.exec()
 
     # def about_clicked(self):
     #     logging.debug("关于按钮已按下")
-    #     self.w = Ui_Dialog()
-    #     self.w.show()
+    #     about_msg = QMessageBox()
+    #     about_msg.setWindowTitle("关于")
+    #     icon = QIcon()
+    #     icon.addFile(u"src/resources/logo.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+    #     about_msg.setWindowIcon(icon)
+    #     about_msg.setText("Equation Solver\n版本: v1.0\n作者: SourceX")
+    #     about_msg.show()
+    #     about_msg.exec()
 
+    def about_clicked(self):
+        logging.debug("关于按钮已按下")
+        about_dialog = QDialog(self)
+        about_ui = Ui_About_Dialog()
+        about_ui.setupUi(about_dialog)
+        about_ui.commandLinkButton_bilibili.clicked.connect(about_ui.commandLinkButton_bilibili_clicked)
+        about_ui.commandLinkButton_github.clicked.connect(about_ui.commandLinkButton_github_clicked)
+        about_dialog.setWindowTitle("关于")
+        icon = QIcon()
+        icon.addFile(u"src/resources/logo.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        about_dialog.setWindowIcon(icon)
+        about_dialog.exec()
 
     def help_clicked(self):
         logging.debug("帮助按钮已按下")
         help_msg = QMessageBox()
         help_msg.setWindowTitle("帮助")
         icon = QIcon()
-        icon.addFile(u"logo.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon.addFile(u"src/resources/logo.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         help_msg.setWindowIcon(icon)
-        help_msg.setText(mth.help1())
+        help_msg.setText(tools.show_help())
         help_msg.show()
         help_msg.exec()
 

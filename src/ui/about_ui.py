@@ -8,21 +8,14 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QCommandLinkButton, QDialog,
-    QDialogButtonBox, QGridLayout, QLabel, QSizePolicy,
-    QSpacerItem, QVBoxLayout, QWidget)
-
 import webbrowser
 
-developer_bilibili = "https://space.bilibili.com/3461569679722999?spm_id_from=333.337.0.0"
-project_github = "https://github.com/SourceX-314/EquationSolver"
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize, Qt)
+from PySide6.QtGui import (QFont, QIcon, QPixmap)
+from PySide6.QtWidgets import (QCommandLinkButton, QDialogButtonBox, QGridLayout, QLabel, QSizePolicy, QSpacerItem, QVBoxLayout)
+
+developer_bilibili = "https://space.bilibili.com/3461569679722999"
+project_github = "https://github.com/sourcexex/EquationSolver"
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -30,7 +23,7 @@ class Ui_Dialog(object):
             Dialog.setObjectName(u"Dialog")
         Dialog.resize(456, 303)
         icon = QIcon()
-        icon.addFile(u"logo.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon.addFile(u"src/resources/logo.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         Dialog.setWindowIcon(icon)
         self.gridLayout = QGridLayout(Dialog)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -108,17 +101,13 @@ class Ui_Dialog(object):
         self.buttonBox.rejected.connect(Dialog.reject)
 
         QMetaObject.connectSlotsByName(Dialog)
-
-
-        self.ui.commandLinkButton_bilibili.clicked.connect(commandLinkButton_bilibili_clicked)
-        self.ui.commandLinkButton_github.clincked.connect(commandLinkButton_github_clicked)
     # setupUi
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
         self.label_main.setText(QCoreApplication.translate("Dialog", u"Equation Solver", None))
         self.label_ver.setText(QCoreApplication.translate("Dialog", u"v 1.0", None))
-        self.label_developer.setText(QCoreApplication.translate("Dialog", u"\u4f5c\u8005: SourceX", None))
+        self.label_developer.setText(QCoreApplication.translate("Dialog", u"\u4f5c\u8005: Sourcex", None))
         self.commandLinkButton_github.setText(QCoreApplication.translate("Dialog", u"GitHub\u94fe\u63a5", None))
         self.commandLinkButton_bilibili.setText(QCoreApplication.translate("Dialog", u"\u4f5c\u8005B\u7ad9", None))
         self.label.setText("")
@@ -126,8 +115,8 @@ class Ui_Dialog(object):
 
     
 
-    def commandLinkButton_bilibili_clicked():
+    def commandLinkButton_bilibili_clicked(self):
         webbrowser.open(developer_bilibili)
 
-    def commandLinkButton_github_clicked():
+    def commandLinkButton_github_clicked(self):
         webbrowser.open(project_github)
