@@ -1,8 +1,9 @@
 import sys
 import time
+
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QAction, QIcon
-from core import mth
+from core import tools
 from ui.ui_MainWindow import Ui_MainWindow
 import logging
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
@@ -42,6 +43,7 @@ class MainWindow(QMainWindow):
         self.ui.lineEdit_range.setText("")
 
     def solve_clicked(self):
+        global time_used, answer
         logging.debug("求解按钮已按下")
         eqn = self.ui.lineEdit_eqn.text()
         unknow = self.ui.lineEdit_unknow.text()
@@ -70,11 +72,11 @@ class MainWindow(QMainWindow):
         else:
             constraints = self.ui.lineEdit_range.text()
         try:
-            s1 = time.time()
-            ans = mth.solve_equation(eqn, unknow, fr, im, ne, constraints)
-            s2 = time.time()
-            s = s2-s1
-            logging.debug(f"结果:{ans}\n用时:{s}")
+            time_1 = time.time()
+            answer = tools.solve_equation(eqn, unknow, fr, im, ne, constraints)
+            time_2 = time.time()
+            time_used = time_2-time_1
+            logging.debug(f"结果:{answer}\n用时:{time_used}")
         except Exception as e:
             logging.error(f"错误:{e}")
             if self.ui.lineEdit_eqn.text() == "":
@@ -83,17 +85,18 @@ class MainWindow(QMainWindow):
             else:
                 self.ui.textBrowser_output.setText(f"求解方程出错,请检查方程是否错误!!!\n详细错误信息如下:\n{str(e)}")
                 self.ui.textBrowser_output.setEnabled(True)
-        if ans is None:
+        if answer is None:
             self.ui.textBrowser_output.setText("此方程无解!!!\n请检查范围，未知数和方程是否正确")
         else:
-            if isinstance(ans,dict) == False and len(ans) > 1:
-                stra = "以下是所有解:\n"
-                for i in range(len(ans)):
-                    ansa = ans[i]
-                    stra = stra + str(ansa)[1:-1] + "\n"+"-"*10+"\n"
-                self.ui.textBrowser_output.setText(stra+"\n用时: "+str(s))
+            if isinstance(answer,dict) == False and len(answer) > 1:
+                str_result = "以下是所有解:\n"
+                for i in range(len(answer)):
+                    ans_tmp = answer[i]
+                    str_result = str_result + str(ans_tmp)[1:-1] + "\n"+"-"*10+"\n"
+                    str_result = str_result+"\n用时: "+str(time_used)
+                self.ui.textBrowser_output.setText(str_result)
             else:
-                self.ui.textBrowser_output.setText(str(ans)[1:-1]+"\n\n用时:"+str(s))
+                self.ui.textBrowser_output.setText(str(answer)[1:-1]+"\n\n用时:"+str(time_used))
         self.ui.textBrowser_output.setEnabled(True)
 
     def about_clicked(self):
@@ -120,7 +123,7 @@ class MainWindow(QMainWindow):
         icon = QIcon()
         icon.addFile(u"logo.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         help_msg.setWindowIcon(icon)
-        help_msg.setText(mth.help1())
+        help_msg.setText(tools.show_help())
         help_msg.show()
         help_msg.exec()
 
