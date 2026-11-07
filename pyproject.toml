@@ -15,9 +15,10 @@ dependencies = [
 [project.scripts]
 equationsolver = "equationsolver:main"
 
-[build-system]
-requires = ["uv_build>=0.12.5,<0.13.0"]
-build-backend = "uv_build"
+#先不构建
+#[build-system]
+#requires = ["uv_build>=0.12.5,<0.13.0"]
+#build-backend = "uv_build"
 
 # 使用清华源(TUNA)
 [[tool.uv.index]]

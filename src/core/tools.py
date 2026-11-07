@@ -1,17 +1,17 @@
 # import sympy as sp
-from sympy import parse_expr, Eq, symbols, And, solve, simplify
-from typing import List, Dict, Any, Optional, Union, Tuple
 import re
+from typing import List, Dict, Optional, Union
 
+from sympy import parse_expr, Eq, symbols, And, solve, simplify
 from sympy.parsing.sympy_parser import standard_transformations, implicit_multiplication, convert_xor
 
 
 def show_help():
     func = {"平方根":"sqrt()","a的n次方根":"root(a,n)","阶乘":"factorial()","正弦函数":"sin()","余弦函数":"cos()","正切函数":"tan()","余切函数":"cot()","正割函数":"sec()","余割函数":"csc()","反正弦":"asin()","反余弦":"acos()","反正切":"atan()","反余切":"acot()","反正割":"asec()","反余割":"acsc()","sinc函数":"sinc()","指数运算":"exp()","以n为底的对数":"log(var, n)","自然对数":"ln(x)或log(x)"}
-    out = "帮助\n方程组输入格式为: 方程1,方程2,...\n\n函数列表:\n"
+    help_output = "帮助\n方程组输入格式为: 方程1,方程2,...\n\n函数列表:\n"
     for i in range(len(func)):
-        out = out + str(list(func.keys())[i]) + "\t\t  " + str(list(func.values())[i]) + "\n"
-    return out
+        help_output = help_output + str(list(func.keys())[i]) + "\t\t  " + str(list(func.values())[i]) + "\n"
+    return help_output
 def solve_equation(
         eq_str: str,
         unknowns: Optional[str] = None,
