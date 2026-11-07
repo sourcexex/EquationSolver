@@ -58,7 +58,12 @@ uv sync
 仓库已配置 GitHub Actions：
 
 - `.github/workflows/ci.yml`：向任意分支推送或提交 PR 时自动运行 CI（安装依赖、字节码编译、模块导入检查）
-- `.github/workflows/build.yml`：推送到 `master`/`main`、推送 `v*` 标签或手动触发时，使用 Nuitka 以 `--standalone`（多文件）方式打包。版本号不写死，由 git 标签自动推导（如标签 `v1.2.3` → `1.2.3`；非标签触发时使用 `0.0.<CI 运行序号>`），并写入 exe 文件版本信息；产物为 `EquationSolver-<版本>-windows-x64.zip` 并上传为 Artifact，推送标签时自动附加到对应的 Release
+- `.github/workflows/build.yml`：**仅在推送 `v*` 标签时**触发，使用 Nuitka 以 `--standalone`（多文件）方式打包。版本号取自标签（如标签 `v1.2.3` → `1.2.3`，非纯数字标签会直接失败），并写入 exe 文件版本信息；产物为 `EquationSolver-<版本>-windows-x64.zip`，上传为 Artifact 并自动创建/更新对应的 Release
+
+发布方式：`git tag v1.2.3 && git push origin v1.2.3`
+
+> [!NOTE]
+> CI 使用 `--clang`（clang-cl）编译。MSVC 的 `cl` 在编译 sympy 生成的超大 C 文件时会报 `C1002: compiler is out of heap space`，改用 64 位的 clang-cl 可规避；若 runner 上缺少 clang，可把参数换成 `--mingw64`。
 
 本地打包（多文件）可使用：
 
