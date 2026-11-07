@@ -106,7 +106,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
         self.label_main.setText(QCoreApplication.translate("Dialog", u"Equation Solver", None))
-        self.label_ver.setText(QCoreApplication.translate("Dialog", u"v 1.0", None))
+        self.label_ver.setText(QCoreApplication.translate("Dialog", u"v 0.1.0", None))
         self.label_developer.setText(QCoreApplication.translate("Dialog", u"\u4f5c\u8005: Sourcex", None))
         self.commandLinkButton_github.setText(QCoreApplication.translate("Dialog", u"GitHub\u94fe\u63a5", None))
         self.commandLinkButton_bilibili.setText(QCoreApplication.translate("Dialog", u"\u4f5c\u8005B\u7ad9", None))
