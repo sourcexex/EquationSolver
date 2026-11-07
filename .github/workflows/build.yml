@@ -2,9 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [master, main]
     tags: ["v*"]
-  workflow_dispatch:
 
 concurrency:
   group: build-${{ github.ref }}
@@ -42,17 +40,27 @@ jobs:
         id: version
         shell: bash
         run: |
-          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-            version="${GITHUB_REF_NAME#v}"
-          else
-            version="0.0.${GITHUB_RUN_NUMBER}"
-          fi
-          # Nuitka 的版本号必须是 1-4 段数字, 否则回退为 CI 序号
+          version="${GITHUB_REF_NAME#v}"
+          # Nuitka 的版本号必须是 1-4 段数字
           if [[ ! "${version}" =~ ^[0-9]+(\.[0-9]+){0,3}$ ]]; then
-            version="0.0.${GITHUB_RUN_NUMBER}"
+            echo "标签 '${GITHUB_REF_NAME}' 不是合法的版本标签(如 v1.2.3)" >&2
+            exit 1
           fi
           echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "Version: ${version}"
+
+      - name: Verify clang toolchain
+        shell: pwsh
+        run: |
+          $llvm = "C:\Program Files\LLVM\bin"
+          if (Test-Path "$llvm\clang-cl.exe") {
+            Add-Content -Path $env:GITHUB_PATH -Value $llvm
+            & "$llvm\clang-cl.exe" --version
+          } elseif (Get-Command clang-cl -ErrorAction SilentlyContinue) {
+            clang-cl --version
+          } else {
+            throw "clang-cl not found; switch the build to --mingw64 instead"
+          }
 
       - name: Build with Nuitka (standalone / multi-file)
         shell: bash
@@ -61,6 +69,9 @@ jobs:
           uv run python -m nuitka \
             --assume-yes-for-downloads \
             --standalone \
+            --clang \
+            --jobs=2 \
+            --lto=no \
             --enable-plugin=pyside6 \
             --include-package-data=sympy \
             --nofollow-import-to=sympy.testing \
@@ -108,8 +119,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Attach to release
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
